@@ -1,4 +1,3 @@
-import sys
 import streamlit as st
 import pandas as pd
 import pickle
@@ -15,6 +14,7 @@ from reportlab.platypus import (
     Spacer,
     PageBreak
 )
+import plotly.graph_objects as go
 
 from reportlab.lib.styles import (
     getSampleStyleSheet
@@ -29,16 +29,21 @@ from datetime import datetime
 # =====================================
 
 st.set_page_config(
-    page_title="Multimorbidity Prediction System",
+    page_title="SMART Multimorbidity Prediction System",
     page_icon="🏥",
     layout="wide"
 )
 
+
 st.markdown("""
 <style>
 
-.main {
-    background-color: #f7f9fc;
+.stApp {
+    background: linear-gradient(
+        135deg,
+        #ffffff,
+        #f3f6fa
+    );
 }
 
 h1, h2, h3 {
@@ -64,21 +69,35 @@ h1, h2, h3 {
 </style>
 """, unsafe_allow_html=True)
 
-col_logo, col_title = st.columns([1, 6])
+    
+st.markdown("""
+    <div style="
+    width:100%;
+    background:linear-gradient(135deg,#0d47a1,#1976d2);
+    padding:40px;
+    border-radius:20px;
+    color:white;
+    text-align:center;
+    margin-bottom:25px;
+    ">
 
-with col_logo:
-    st.image("logo-umpsa.png", width=120)
+    <h1 style="font-size:48px; margin-bottom:15px;">
+    SMART MULTIMORBIDITY PREDICTION AND DECISION SUPPORT SYSTEM
+    </h1>
 
-with col_title:
-    st.title(
-        "SMART MULTIMORBIDITY PREDICTION AND DECISION SUPPORT SYSTEM"
-    )
+    <h3 style="margin-bottom:20px;">
+    🧠 Predict • 🩺 Prevent • 🛡️ Protect
+    </h3>
 
-    st.caption(
-        "Centre for Mathematical Sciences, Universiti Malaysia Pahang Al-Sultan Abdullah"
-    )
-st.markdown(
-    "Predict the risk of Diabetes, Heart Disease, and Cancer using the trained XGBoost model."
+    <p style="font-size:18px;">
+    Transforming healthcare risk assessment through Explainable AI and advanced XGBoost predictive modeling.
+    </p>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+st.info(
+    "AI-Powered Clinical Decision Support System for Diabetes, Heart Disease, and Cancer Risk Assessment"
 )
 
 # =====================================
@@ -237,6 +256,54 @@ with col2:
 # =====================================
 # PREDICTION
 # =====================================
+
+def create_gauge(probability):
+
+    if disease == "Diabetes_Target":
+        gauge_color = "#ff7700"
+
+    elif disease == "Heart_Disease_Target":
+        gauge_color = "#B80303"
+
+    else:
+        gauge_color = "#ffc73a"
+
+    fig = go.Figure(
+        go.Indicator(
+            mode="gauge",
+            value=probability * 100,
+
+            number={
+                "suffix":"%",
+                "font":{"size":36}
+            },
+
+            gauge={
+                "axis":{"range":[0,100]},
+
+                "bar":{"color":gauge_color},
+
+                "steps":[
+                    {"range":[0,30],"color":"#e8f5e9"},
+                    {"range":[30,60],"color":"#fff8e1"},
+                    {"range":[60,100],"color":"#ffebee"}
+                ],
+
+                "threshold":{
+                    "line":{"color":"red","width":4},
+                    "thickness":0.75,
+                    "value":probability*100
+                }
+            }
+        )
+    )
+
+    fig.update_layout(
+        margin=dict(l=10, r=10, t=20, b=20),
+        height=180
+    )
+
+    return fig
 
 # Create SHAP explainers
 explainers = {}
@@ -617,6 +684,12 @@ if st.button("Predict Risk"):
                     unsafe_allow_html=True
                 )
 
+                st.plotly_chart(
+                    create_gauge(probability),
+                    use_container_width=True
+                )
+
+
                 if result["Prediction"] == 1:
 
                     st.markdown(
@@ -712,7 +785,7 @@ if st.button("Predict Risk"):
         <h2>Risk Status: {status}</h2>
 
         <p><b>Number of Predicted Conditions:</b>
-        {num_positive}</p>
+            {num_positive}</p>
 
         <p><b>Predicted Conditions:</b></p>
 
@@ -780,6 +853,9 @@ if st.button("Predict Risk"):
         "Age_Category_70-74": "Age 70-74 Years",
         "Age_Category_65-69": "Age 65-69 Years",
 
+        "Sex_Male": "Male Gender",
+        "Sex_Female": "Female Gender",
+
         # Lifestyle & Health
         "Smoking_History_Yes": "Smoking History",
         "Depression_Yes": "Depression",
@@ -823,6 +899,58 @@ if st.button("Predict Risk"):
             fig,
             use_container_width=True
         )
+
+        top_risk_factors = (
+            feature_summary["Display"]
+            .head(5)
+            .tolist()
+        )
+
+        st.markdown(
+            """
+            <div style="
+                background:#fafafa;
+                border-left:8px solid #fb8c00;
+                padding:20px;
+                border-radius:12px;
+                margin-top:20px;
+                margin-bottom:20px;
+            ">
+                <h3>⚠️ Top Risk Drivers</h3>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        for factor in top_risk_factors:
+
+            st.markdown(
+                f"""
+                <div style="
+                    background:#fafafa;
+                    padding:12px;
+                    margin-bottom:8px;
+                    border-radius:10px;
+                    border-left:5px solid #ef5350;
+                    font-size:16px;
+                    font-weight:500;
+                ">
+                    🔺 {factor}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        # Split factors into risk vs protective
+
+        risk_factors = feature_summary[
+            feature_summary["SHAP Value"] > 0
+        ]
+
+        protective_factors = feature_summary[
+            feature_summary["SHAP Value"] < 0
+        ]
+        
 
     st.markdown("---")
     st.header("Personalized Health Recommendations")
@@ -934,39 +1062,57 @@ st.markdown("---")
 with st.expander("ℹ️ About This System"):
 
     st.markdown("""
-    This system predicts the risk of:
-    
-    • Diabetes
-    • Heart Disease
-    • Cancer
-    
-    using machine learning models developed with XGBoost.
+This system predicts the risk of:
 
-    The system also provides:
-    
-    • Multimorbidity assessment
-    • Explainable AI insights
-    • Personalized recommendations
-    • Downloadable health reports
+- Diabetes
+- Heart Disease
+- Cancer
 
-    This system is intended for educational and decision-support purposes only.
-    """)
+using machine learning models developed with XGBoost.
+
+The system also provides:
+
+- Multimorbidity assessment
+- Explainable AI insights
+- Personalized recommendations
+- Downloadable health reports
+
+This system is intended for educational and decision-support purposes only.
+""")
 
 st.markdown("---")
 
-st.markdown(
-    """
-    <div style='text-align:center;color:gray;font-size:14px'>
-    
-    SMART MULTIMORBIDITY PREDICTION AND DECISION SUPPORT SYSTEM
-    
-    Centre for Mathematical Sciences
-    
-    Universiti Malaysia Pahang Al-Sultan Abdullah
-    
-    Developed using XGBoost and SHAP Explainable AI
-    
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div style="
+    margin-top:50px;
+    padding:25px;
+    border-top:1px solid #dce3ea;
+    text-align:center;
+    color:#666;
+    font-size:14px;
+">
+
+<h4 style="
+    color:#0d47a1;
+    margin-bottom:15px;
+">
+SMART MULTIMORBIDITY PREDICTION AND DECISION SUPPORT SYSTEM
+</h4>
+
+<p>
+<b>Centre for Mathematical Sciences</b><br>
+Universiti Malaysia Pahang Al-Sultan Abdullah
+</p>
+
+<p>
+<b>XGBoost</b> |
+<b>SHAP Explainable AI</b> |
+<b>Streamlit</b>
+</p>
+
+<p>
+Version 1.0 | © 2026 UMPSA
+</p>
+
+</div>
+""", unsafe_allow_html=True)
