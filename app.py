@@ -4,7 +4,6 @@ import pandas as pd
 import pickle
 import xgboost
 import shap
-import matplotlib.pyplot as plt
 from xgboost import XGBClassifier
 import pickle
 import plotly.express as px
