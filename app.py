@@ -595,17 +595,6 @@ if st.button("Predict Risk"):
             )
 
             with st.container(border=True):
-                st.markdown(
-                    """
-                    <div style="
-                        background-color:#f8f9fa;
-                        border-radius:15px;
-                        padding:20px;
-                        min-height:320px;
-                    ">
-                    """,
-                    unsafe_allow_html=True
-                )
 
                 st.markdown(
                     f"""
