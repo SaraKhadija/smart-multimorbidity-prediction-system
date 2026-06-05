@@ -831,18 +831,36 @@ if st.button("Predict Risk"):
 
     feature_names = {
 
+        # Medical Checkup History
+        "Last_Medical_Checkup_Checkup_Within_the_past_year": "Medical Checkup Within the Past Year",
+        "Last_Medical_Checkup_Checkup_Within_the_past_2_years": "Medical Checkup Within the Past 2 Years",
+        "Last_Medical_Checkup_Checkup_Within_the_past_5_years": "Medical Checkup Within the Past 5 Years",
+        "Last_Medical_Checkup_Checkup_5_or_more_years_ago": "Medical Checkup 5 or More Years Ago",
+        "Last_Medical_Checkup_Checkup_Never": "Never Had a Medical Checkup",
+
         # General Health
         "General_Health_Poor": "Poor General Health",
         "General_Health_Fair": "Fair General Health",
         "General_Health_Good": "Good General Health",
         "General_Health_Very Good": "Very Good General Health",
+        "General_Health_Excellent": "Excellent General Health",
 
         # Age
+        "Age_Category_18-24": "Young Adult (18-24 Years)",
+        "Age_Category_25-29": "Young Adult (25-29 Years)",
+        "Age_Category_30-34": "Adult (30-34 Years)",
+        "Age_Category_35-39": "Adult (35-39 Years)",
+        "Age_Category_40-44": "Middle-Aged Adult (40-44 Years)",
+        "Age_Category_45-49": "Middle-Aged Adult (45-49 Years)",
+        "Age_Category_50-54": "Middle-Aged Adult (50-54 Years)",
+        "Age_Category_55-59": "Older Adult (55-59 Years)",
+        "Age_Category_60-64": "Older Adult (60-64 Years)",
+        "Age_Category_65-69": "Senior Adult (65-69 Years)",
+        "Age_Category_70-74": "Senior Adult (70-74 Years)",
+        "Age_Category_75-79": "Senior Adult (75-79 Years)",
         "Age_Category_80+": "Age Above 80 Years",
-        "Age_Category_75-79": "Age 75-79 Years",
-        "Age_Category_70-74": "Age 70-74 Years",
-        "Age_Category_65-69": "Age 65-69 Years",
 
+        #Sex
         "Sex_Male": "Male Gender",
         "Sex_Female": "Female Gender",
 
