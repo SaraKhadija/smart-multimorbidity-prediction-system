@@ -877,18 +877,9 @@ if st.button("Predict Risk"):
 
     if not feature_summary.empty:
 
-        fig = px.bar(
-            feature_summary,
-            x="SHAP Value",
-            y="Display",
-            orientation="h",
-            title="Top Factors Associated with the Risk"
-        )
+        chart_data = feature_summary.set_index("Display")[["SHAP Value"]]
 
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
+        st.bar_chart(chart_data)
 
         top_risk_factors = (
             feature_summary["Display"]
