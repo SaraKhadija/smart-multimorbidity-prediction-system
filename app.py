@@ -257,7 +257,7 @@ with col2:
 # PREDICTION
 # =====================================
 
-def create_gauge(probability):
+def create_gauge(probability, disease):
 
     if disease == "Diabetes_Target":
         gauge_color = "#ff7700"
@@ -270,7 +270,7 @@ def create_gauge(probability):
 
     fig = go.Figure(
         go.Indicator(
-            mode="gauge",
+            mode="gauge+number",
             value=probability * 100,
 
             number={
@@ -300,7 +300,8 @@ def create_gauge(probability):
 
     fig.update_layout(
         margin=dict(l=10, r=10, t=20, b=20),
-        height=180
+        height=180,
+        autosize=True
     )
 
     return fig
@@ -685,7 +686,7 @@ if st.button("Predict Risk"):
                 )
 
                 st.plotly_chart(
-                    create_gauge(probability),
+                    create_gauge(probability, disease),
                     use_container_width=True
                 )
 
@@ -753,7 +754,9 @@ if st.button("Predict Risk"):
         risk_color = "#4CAF50"
         status = "LOW RISK"
         recommendation = (
-            "No chronic disease risk detected."
+            "Excellent health profile detected. "
+            "Continue maintaining your healthy lifestyle and regular health practices. "
+            "Keep up the good work! 🌟"
         )
 
     elif num_positive == 1:
@@ -761,7 +764,8 @@ if st.button("Predict Risk"):
         risk_color = "#FF9800"
         status = "MODERATE RISK"
         recommendation = (
-            "One chronic disease risk detected."
+            "One chronic disease risk factor was detected. "
+            "Lifestyle improvements and periodic health monitoring are recommended."
         )
 
     else:
@@ -769,8 +773,25 @@ if st.button("Predict Risk"):
         risk_color = "#F44336"
         status = "HIGH RISK"
         recommendation = (
-            "Multimorbidity detected."
+            "Multimorbidity risk was detected."
+            "A comprehensive medical assessment and appropriate lifestyle modifications are strongly recommended."
         )
+
+    if len(predicted_conditions) == 0:
+
+        predicted_conditions_html = """
+        <p style='color:#4CAF50;font-weight:bold;'>
+        None
+        </p>
+    """
+
+    else:
+
+        predicted_conditions_html = f"""
+        <ul>
+            {''.join([f'<li>{x}</li>' for x in predicted_conditions])}
+        </ul>
+        """
 
     st.markdown(
         f"""
@@ -789,9 +810,7 @@ if st.button("Predict Risk"):
 
         <p><b>Predicted Conditions:</b></p>
 
-        <ul>
-            {''.join([f'<li>{x}</li>' for x in predicted_conditions])}
-        </ul>
+        {predicted_conditions_html}
 
         <p><b>Recommendation:</b></p>
 
@@ -801,6 +820,7 @@ if st.button("Predict Risk"):
         """,
         unsafe_allow_html=True
     )
+    
 
     st.markdown("---")
     st.header("Key Contributing Factors")
