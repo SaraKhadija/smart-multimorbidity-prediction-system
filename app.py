@@ -633,7 +633,32 @@ if st.button("Predict Risk"):
                     f"<h1 style='text-align:center;'>{probability:.1%}</h1>",
                     unsafe_allow_html=True
                 )
-                st.progress(float(probability))
+                if result["Prediction"] == 1:
+                    progress_color = "#e53935"   # red
+
+                else:
+                    progress_color = "#43a047"   # green
+
+                st.markdown(
+                    f"""
+                    <div style="
+                        width:100%;
+                        background:#eeeeee;
+                        border-radius:10px;
+                        height:12px;
+                        margin-bottom:15px;
+                    ">
+                        <div style="
+                            width:{probability*100:.1f}%;
+                            background:{progress_color};
+                            height:12px;
+                            border-radius:10px;
+                        ">
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
 
                 if result["Prediction"] == 1:
