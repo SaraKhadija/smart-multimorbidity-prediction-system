@@ -875,11 +875,27 @@ if st.button("Predict Risk"):
         .tolist()
     )
 
+    risk_factors = (
+        feature_summary[
+            feature_summary["SHAP Value"] > 0
+        ]
+        .sort_values(
+            "SHAP Value",
+            ascending=False
+        )
+    )
+
+    protective_factors = (
+        feature_summary[
+            feature_summary["SHAP Value"] < 0
+        ]
+        .sort_values(
+            "SHAP Value",
+            ascending=True
+        )
+    )
+
     if not feature_summary.empty:
-
-        chart_data = feature_summary.set_index("Display")[["SHAP Value"]]
-
-        st.bar_chart(chart_data)
 
         top_risk_factors = (
             feature_summary["Display"]
@@ -890,11 +906,10 @@ if st.button("Predict Risk"):
         st.markdown(
             """
             <div style="
-                background:#fafafa;
+                background:#fff3e0;
                 border-left:8px solid #fb8c00;
                 padding:20px;
                 border-radius:12px;
-                margin-top:20px;
                 margin-bottom:20px;
             ">
                 <h3>⚠️ Top Risk Drivers</h3>
@@ -908,11 +923,11 @@ if st.button("Predict Risk"):
             st.markdown(
                 f"""
                 <div style="
-                    background:#fafafa;
+                    background:#ffebee;
                     padding:12px;
-                    margin-bottom:8px;
+                    margin-bottom:10px;
                     border-radius:10px;
-                    border-left:5px solid #ef5350;
+                    border-left:5px solid #e53935;
                     font-size:16px;
                     font-weight:500;
                 ">
@@ -922,15 +937,6 @@ if st.button("Predict Risk"):
                 unsafe_allow_html=True
             )
 
-        # Split factors into risk vs protective
-
-        risk_factors = feature_summary[
-            feature_summary["SHAP Value"] > 0
-        ]
-
-        protective_factors = feature_summary[
-            feature_summary["SHAP Value"] < 0
-        ]
         
 
     st.markdown("---")
