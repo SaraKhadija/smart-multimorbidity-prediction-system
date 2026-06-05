@@ -6,7 +6,6 @@ import shap
 from xgboost import XGBClassifier
 import pickle
 import plotly.express as px
-import plotly.graph_objects as go
 import plotly.express as px
 from reportlab.platypus import (
     SimpleDocTemplate,
@@ -14,7 +13,6 @@ from reportlab.platypus import (
     Spacer,
     PageBreak
 )
-import plotly.graph_objects as go
 
 from reportlab.lib.styles import (
     getSampleStyleSheet
@@ -256,55 +254,6 @@ with col2:
 # =====================================
 # PREDICTION
 # =====================================
-
-def create_gauge(probability, disease):
-
-    if disease == "Diabetes_Target":
-        gauge_color = "#ff7700"
-
-    elif disease == "Heart_Disease_Target":
-        gauge_color = "#B80303"
-
-    else:
-        gauge_color = "#ffc73a"
-
-    fig = go.Figure(
-        go.Indicator(
-            mode="gauge+number",
-            value=probability * 100,
-
-            number={
-                "suffix":"%",
-                "font":{"size":36}
-            },
-
-            gauge={
-                "axis":{"range":[0,100]},
-
-                "bar":{"color":gauge_color},
-
-                "steps":[
-                    {"range":[0,30],"color":"#e8f5e9"},
-                    {"range":[30,60],"color":"#fff8e1"},
-                    {"range":[60,100],"color":"#ffebee"}
-                ],
-
-                "threshold":{
-                    "line":{"color":"red","width":4},
-                    "thickness":0.75,
-                    "value":probability*100
-                }
-            }
-        )
-    )
-
-    fig.update_layout(
-        margin=dict(l=10, r=10, t=20, b=20),
-        height=180,
-        autosize=True
-    )
-
-    return fig
 
 # Create SHAP explainers
 explainers = {}
@@ -684,11 +633,7 @@ if st.button("Predict Risk"):
                     f"<h1 style='text-align:center;'>{probability:.1%}</h1>",
                     unsafe_allow_html=True
                 )
-
-                st.plotly_chart(
-                    create_gauge(probability, disease),
-                    use_container_width=True
-                )
+                st.progress(float(probability))
 
 
                 if result["Prediction"] == 1:
